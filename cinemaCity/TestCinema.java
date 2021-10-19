@@ -17,68 +17,80 @@ public class TestCinema {
     private List<String> subtitrariFilm1, subtitrariFilm2, subtitrariFilm3;
     private Film filmInDerulare, filmInAsteptare1, filmInAsteptare2;
     private SalaCinema salaDeFilm;
+    private boolean isDscountBun = true;
 
     public TestCinema(int numarSpectatori, int discount) throws IOException {
-        System.out.println("La ghiseu sunt " + numarSpectatori + " cinefili interesati pentru filmul actual");
-        System.out.println("Posibilul discount al biletului este: " + discount);
-        //Citeste spectatori la rand din consola:
-        int numarMaximSala = SalaCinema.getNrMaxLocuri();
-        if (numarSpectatori <= numarMaximSala) {
-            this.numarSpectatori = numarSpectatori;
-            spectatoriLaRand = new ArrayList<>();
-            for (int i = 0; i < numarSpectatori; i++) {
-                System.out.println("Scrie numele sau prenumele, banii si subtitrarea preferata, despartite de un spatiu apoi ENTER: ");
-                BufferedReader inregistreazaSpectatori = new BufferedReader(new InputStreamReader(System.in));
-                String argumenteSpectator[] = inregistreazaSpectatori.readLine().split(" ");
-                String numeSauPrenume = argumenteSpectator[0];
-                String baniSpectator = argumenteSpectator[1];
-                String subtitrarePreferata = argumenteSpectator[2];
-                spectatoriLaRand.add(new Spectatorul(numeSauPrenume, Integer.parseInt(baniSpectator), subtitrarePreferata));
+        //verifica daca e discount pozitiv
+        if (discount >= 0) {
+            System.out.println("La ghiseu sunt " + numarSpectatori + " cinefili interesati pentru filmul actual");
+            System.out.println("Posibilul discount al biletului este: " + discount);
+            //Citeste spectatori la rand din consola:
+            int numarMaximSala = SalaCinema.getNrMaxLocuri();
+            if (numarSpectatori <= numarMaximSala) {
+                this.numarSpectatori = numarSpectatori;
+                spectatoriLaRand = new ArrayList<>();
+
+                for (int i = 0; i < numarSpectatori; i++) {
+                    System.out.println("Scrie numele sau prenumele, banii si subtitrarea preferata, despartite de un spatiu apoi ENTER: ");
+                    BufferedReader inregistreazaSpectatori = new BufferedReader(new InputStreamReader(System.in));
+                    String argumenteSpectator[] = inregistreazaSpectatori.readLine().split(" ");
+                    String numeSauPrenume = argumenteSpectator[0];
+                    String baniSpectator = argumenteSpectator[1];
+                    String subtitrarePreferata = argumenteSpectator[2];
+                    //verifica daca e discount mai mic sau egal cu suma spectatorului
+                    if (Integer.parseInt(baniSpectator) > discount) {
+                        spectatoriLaRand.add(new Spectatorul(numeSauPrenume, Integer.parseInt(baniSpectator), subtitrarePreferata));
+                    } else {
+                        System.out.println("Atentie - Discountul este mult prea mare!!!");
+                        isDscountBun = false;
+                        break;
+                    }
+                }
+            } else {
+                System.out.println("Capacitatea salii de cinema  (maxim " + numarMaximSala + " )  e mai mica fata de numarul de spectatori interesati sa vada filmul!");
             }
         } else {
-            System.out.println("Capacitatea salii de cinema  (maxim " + numarMaximSala + " )  e mai mica fata de numarul de spectatori interesati sa vada filmul!");
+            System.out.println("Atentie - a fost introdus doscount negativ");
+            isDscountBun = false;
         }
-        adaugaSubtitrariFilm();
-       /* adaugaSubtitrariFilm(subtitrariFilm1, new String[]{"Engleza", "Germana", "Romana"});
-        adaugaSubtitrariFilm(subtitrariFilm2, new String[]{"Chineza", "Germana"});
-        adaugaSubtitrariFilm(subtitrariFilm3, new String[]{"Engleza"});*/
-        pregatesteFilmePtSala();
-        //pregatesteFilmePtSala(filmInDerulare,"actiune","Terminator1", subtitrariFilm1, EfecteSpecialeFilm.efect4DX);
-        //pregatesteFilmePtSala(filmInAsteptare1,"comedie","Terminator2", subtitrariFilm2,EfecteSpecialeFilm.efect7D);
-        //pregatesteFilmePtSala(filmInAsteptare2,"groaza","Terminator3", subtitrariFilm3,EfecteSpecialeFilm.efectIMAX);
-        pregatesteSala();
-        completareSalaCinema(discount);
+        if (isDscountBun == true) {
+            adaugaSubtitrariFilm();
+            pregatesteFilmePtSala();
+            pregatesteSala();
+            completareSalaCinema(discount);
+        } else {
+            System.out.println("Introdu un discount corespnzator!");
+        }
+
     }
 
     //creeaza subtitrarile disponibile pt fiecare film in parte
     public void adaugaSubtitrariFilm() {
-        subtitrariFilm1 = new ArrayList<>();
-        subtitrariFilm1.add("Engleza");
-        subtitrariFilm1.add("Germana");
-        subtitrariFilm1.add("Romana");
-        subtitrariFilm2 = new ArrayList<>();
-        subtitrariFilm2.add("Chineza");
-        subtitrariFilm2.add("Germana");
-        subtitrariFilm2.add("Romana");
-        subtitrariFilm3 = new ArrayList<>();
-        subtitrariFilm3.add("Engleza");
+        subtitrariFilm1 = adaugaSubtitrariFilm(new String[]{"Engleza", "Germana", "Romana"});
+        subtitrariFilm2 = adaugaSubtitrariFilm(new String[]{"Chineza", "Germana"});
+        subtitrariFilm3 = adaugaSubtitrariFilm(new String[]{"Engleza"});
     }
-   /* public void adaugaSubtitrariFilm(List<String> listaSubtitrare, String[] limbiListaSubtitrare) {
-        listaSubtitrare = new ArrayList<>();
+
+    //returneaza liste cu subtitrari
+    public List<String> adaugaSubtitrariFilm(String[] limbiListaSubtitrare) {
+        List<String> listaSubtitrare = new ArrayList<>();
+
         for (int limba = 0; limba < limbiListaSubtitrare.length; limba++) {
             listaSubtitrare.add(limbiListaSubtitrare[limba]);
         }
-
-    }*/
-
-    //creeaza filme  cu subtitrarile aferente
-    public void pregatesteFilmePtSala() {
-        filmInDerulare = new FilmDeActiune("Terminator1", subtitrariFilm1, EfecteSpecialeFilm.efect4DX);
-        filmInAsteptare1 = new FilmDeComedie("Terminator2", subtitrariFilm2, EfecteSpecialeFilm.efect7D);
-        filmInAsteptare2 = new FilmDeGroaza("Terminator3", subtitrariFilm3, EfecteSpecialeFilm.efectIMAX);
+        return listaSubtitrare;
     }
 
-  /*  public void pregatesteFilmePtSala(Film film, String genFilm, String titluFilm, List<String> subtitrare, EfecteSpecialeFilm efect) {
+    //creeaza filmele cu caracteristicile aferente
+    public void pregatesteFilmePtSala() {
+        filmInDerulare = pregatesteFilmePtSala("actiune", "Terminator1", subtitrariFilm1, "4DX");
+        filmInAsteptare1 = pregatesteFilmePtSala("comedie", "Terminator2", subtitrariFilm2, "7D");
+        filmInAsteptare2 = pregatesteFilmePtSala("groaza", "Terminator3", subtitrariFilm3, "IMAX");
+    }
+
+    //returneaza filmul cu genul corespunzator
+    public Film pregatesteFilmePtSala(String genFilm, String titluFilm, List<String> subtitrare, String efect) {
+        Film film = null;
         if (genFilm == "actiune") {
             film = new FilmDeActiune(titluFilm, subtitrare, efect);
         } else if (genFilm == "comedie") {
@@ -89,62 +101,27 @@ public class TestCinema {
             System.out.println("Gen Film incorect");
 
         }
+        return film;
+    }
 
-    }*/
-
-
-    //creeaza sala de cinema,  setare film curent si adaugare la lista de filma a salii
-    //adaugare alte filme la lista de filme a salii
+    //adaugare  filme la lista de filme a salii si setare film curent
     public void pregatesteSala() {
-        salaDeFilm = new SalaCinema(filmInDerulare);
+        salaDeFilm = new SalaCinema();
         salaDeFilm.adaugaFilm(filmInDerulare);
         salaDeFilm.adaugaFilm(filmInAsteptare1);
         salaDeFilm.adaugaFilm(filmInAsteptare2);
+        salaDeFilm.setFilmCurent(filmInDerulare);
     }
 
-    //creeaza lista de spectatori potriviti pentru sala
+    //creeaza lista de spectatori care isi permit biletul si au dreptul de acces in sala
     public void completareSalaCinema(int discount) {
         for (int i = 0; i < numarSpectatori; i++) {
             System.out.println("##################### " + (i + 1) + " este numarul de ordine al spectatorului: " + spectatoriLaRand.get(i));
 
             Spectatorul spectatorLaGhiseu = spectatoriLaRand.get(i);
-            List<String> listSubtitrariFilmActual = filmInDerulare.getListaSubtitrari();
-            String subtitrarePreferataSpectator = spectatorLaGhiseu.getSubtitrarePreferata();
-
-            //memoreaza bani spectator si pretul filmului
-            int baniSpectator = spectatorLaGhiseu.getSumaDeBaniSpectator();
-            int pretBilet = filmInDerulare.calculeazaPretBilet();
-
-            //compara banii disponibili ai spectatorului cu pretul actualului film
-            if (baniSpectator >= pretBilet) {
-                //cumpara bilet daca corespunde criteriu 1: subtitrare preferata este inclusa in lista de subtitrari a filmului
-                if (listSubtitrariFilmActual.contains(subtitrarePreferataSpectator)) {
-                    //cumpara bilet si implicit adauga spectatorul in lista salii
-                    salaDeFilm.cumparaBilet(spectatorLaGhiseu);
-                    spectatorLaGhiseu.setActualizareSumaDeBaniSpectator(pretBilet);
-                    System.out.println("1.Pt " + spectatorLaGhiseu.getNumeSpectator() + " se indeplineste criteriul <1> de cumparare a biletului: isi permite biletul si subtitrarea lui preferata coincide cu lista filmului difuzat");
-                }
-                //cumpara bilet daca corespunde criteriu 2: subtitrarea preferata nu se potriveste dar Spectatorul isi permite banii
-                // respectiv exista sau nu discount
-                else {
-                    System.out.println("Pt " + spectatorLaGhiseu.getNumeSpectator() + " - Nu exista subtitrare potrivita...dar poate intra la film cu un discount = " + discount);
-                    //cumpara bilet cu discount si implicit adauga spectatorul in lista salii
-                    int pretCuDiscount = pretBilet - discount;
-                    salaDeFilm.cumparaBilet(spectatorLaGhiseu, pretCuDiscount);
-
-                    //spectatoriLaRand.get(i).setActualizareSumaDeBaniSpectator(pretBilet);
-                    System.out.println("1.Pt " + spectatorLaGhiseu.getNumeSpectator() + " se indeplineste criteriul <2> de cumparare a biletului: isi permite biletul si se aplica discountul de pe bilet");
-                }
-            }
-            //daca Spectatorul nu are suficienti bani
-            else {
-                System.out.println("ATENTIE ! Bani insuficienti!!!!!!!!!! " + spectatorLaGhiseu.getNumeSpectator() + " nu isi permite sa cumpere  biletul");
-            }
-            System.out.println("2.Spectatorul <" + spectatorLaGhiseu.getNumeSpectator() + "> are suma : " + baniSpectator);
-            System.out.println("3.Pretul filmului pentru <" + spectatorLaGhiseu.getNumeSpectator() + "> este: " + pretBilet);
-            System.out.println("4.Suma de bani actualizata pt <" + spectatorLaGhiseu.getNumeSpectator() + " > este: " + spectatorLaGhiseu.getSumaDeBaniSpectator());
-
+            salaDeFilm.cumparaBilet(spectatorLaGhiseu, discount);
         }
+
         // System.out.println("Spectatorii din sala sunt :" + salaDeFilm.getListaSpectatori());
         Iterator it = salaDeFilm.getListaSpectatori().iterator();
         while (it.hasNext()) {
@@ -153,12 +130,13 @@ public class TestCinema {
         }
         System.out.println("Filmele disponibile in limba Engleza sunt : ");
         salaDeFilm.returneazaFilmeCuSubtitrareSpecifica("Engleza");
-
     }
 
     public static void main(String[] args) throws IOException {
         //discount prin consola (nr de spectatori in functie de cati sunt introdusi de la consola)
-        new TestCinema(3, 1);
+       new TestCinema(3, 1);
+        //Film x=new FilmDeActiune("titlu",null,"4DX");
+
     }
 }
 
